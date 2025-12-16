@@ -120,8 +120,8 @@ function App() {
         onPriorChange={handlePriorChange}
       />
 
-      <main className="flex-1 max-w-6xl w-full mx-auto px-6 py-5">
-        <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_420px] gap-6 items-start">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-5">
+        <div className="grid grid-cols-1 md:grid-cols-[420px_minmax(0,1fr)] gap-8 items-start">
           {/* Left column: Inputs + narrative */}
           <div className="space-y-6">
             <AddEvidenceForm

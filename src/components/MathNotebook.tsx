@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { Mafs, Polygon } from 'mafs';
 import { formatPercent } from '../utils/bayesian';
+import { Fraction, LatexFormula } from './LatexFormula';
 
 interface MathNotebookProps {
   currentProbability: number;
@@ -277,7 +278,7 @@ export function MathNotebook({
     };
   }, [currentProbability, draftLikelihoodIfFalse, draftLikelihoodIfTrue]);
 
-  const notSymbol = '\u00AC';
+  const notH = '~H';
 
   return (
     <aside className="md:sticky md:top-6">
@@ -293,27 +294,63 @@ export function MathNotebook({
         </div>
 
         <div className="p-5 space-y-4">
-          <div className="text-xs text-gray-600 bg-gray-50 border border-gray-200 rounded-xl p-3 flex items-center justify-between gap-4">
-            <div>
-              <div className="text-[11px] uppercase tracking-wide text-gray-500 font-semibold">
-                Current Conviction (Prior)
-              </div>
-              <div className="text-2xl font-bold text-emerald-700 data-value">
-                {formatPercent(bayes.pH, 1)}
-              </div>
-              <div className="text-[11px] text-gray-500">
-                {evidenceCount} evidence item{evidenceCount !== 1 ? 's' : ''}
-              </div>
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+            <div className="text-[11px] uppercase tracking-wide text-gray-500 font-semibold text-center">
+              Evidence Likelihoods (from sliders)
             </div>
-            <div className="text-right">
-              <div className="text-[11px] uppercase tracking-wide text-gray-500 font-semibold">
-                Bayes Factor
-              </div>
-              <div className="text-2xl font-bold text-gray-900 data-value">
+
+            <div className="mt-2 flex items-center justify-center gap-3">
+              <LatexFormula className="text-base text-gray-700">BF</LatexFormula>
+              <span className="text-gray-400">=</span>
+              <Fraction
+                className="text-center"
+                numerator={
+                  <div className="flex items-baseline gap-2">
+                    <LatexFormula className="text-sm text-gray-700">P(E|H)</LatexFormula>
+                    <span className="text-2xl font-bold text-emerald-700 data-value">
+                      {formatPercent(bayes.pEGivenH, 0)}
+                    </span>
+                  </div>
+                }
+                denominator={
+                  <div className="flex items-baseline gap-2">
+                    <LatexFormula className="text-sm text-gray-700">
+                      {`P(E|${notH})`}
+                    </LatexFormula>
+                    <span className="text-2xl font-bold text-rose-700 data-value">
+                      {formatPercent(bayes.pEGivenNotH, 0)}
+                    </span>
+                  </div>
+                }
+              />
+              <span className="text-gray-400">=</span>
+              <span className="text-3xl font-bold text-gray-900 data-value">
                 {bayes.bf === Infinity ? '∞' : `${bayes.bf.toFixed(2)}x`}
+              </span>
+            </div>
+
+            <div className="mt-3 flex items-center justify-center gap-8 text-xs text-gray-600">
+              <div className="text-center">
+                <div className="text-[11px] uppercase tracking-wide text-gray-500 font-semibold">
+                  Prior
+                </div>
+                <div className="text-xl font-bold text-emerald-700 data-value">
+                  {formatPercent(bayes.pH, 1)}
+                </div>
+                <div className="text-[11px] text-gray-500">
+                  {evidenceCount} evidence item{evidenceCount !== 1 ? 's' : ''}
+                </div>
               </div>
-              <div className="text-[11px] text-gray-500">
-                P(E|H) {formatPercent(bayes.pEGivenH, 0)} · P(E|{notSymbol}H) {formatPercent(bayes.pEGivenNotH, 0)}
+              <div className="text-center">
+                <div className="text-[11px] uppercase tracking-wide text-gray-500 font-semibold">
+                  Posterior Preview
+                </div>
+                <div className="text-xl font-bold text-emerald-800 data-value">
+                  {formatPercent(bayes.posteriorH, 1)}
+                </div>
+                <div className="text-[11px] text-gray-500">
+                  If you add this evidence next
+                </div>
               </div>
             </div>
           </div>
@@ -355,7 +392,7 @@ export function MathNotebook({
               <div className="flex items-center justify-between gap-3">
                 <span className="flex items-center gap-2">
                   <span className="inline-block h-2 w-2 rounded-sm" style={{ backgroundColor: COLORS.notH }} />
-                  {notSymbol}H
+                  {notH}
                 </span>
                 <span className="data-value text-gray-800">
                   {formatPercent(bayes.pNotH, 1)} → {formatPercent(bayes.posteriorNotH, 1)}
@@ -374,4 +411,3 @@ export function MathNotebook({
     </aside>
   );
 }
-

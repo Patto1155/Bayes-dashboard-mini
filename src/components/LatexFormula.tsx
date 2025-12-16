@@ -2,7 +2,7 @@
 // Since react-latex-next has compatibility issues, we'll use styled HTML/CSS
 
 interface LatexFormulaProps {
-  children: string;
+  children: React.ReactNode;
   className?: string;
 }
 
