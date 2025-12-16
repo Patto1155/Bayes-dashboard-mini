@@ -9,11 +9,6 @@ interface MathNotebookProps {
   evidenceCount: number;
 }
 
-type Segment = {
-  value: number;
-  color: string;
-};
-
 const COLORS = {
   h: '#059669', // emerald-600
   notH: '#e11d48', // rose-600
@@ -26,85 +21,215 @@ function clamp01(value: number) {
   return Math.max(0, Math.min(1, value));
 }
 
-function SquareStack({
-  segments,
-  total = 1,
+function BayesFlowDiagram({
+  pH,
+  wH,
+  wNotH,
+  pE,
+  posteriorH,
 }: {
-  segments: Segment[];
-  total?: number;
+  pH: number;
+  wH: number;
+  wNotH: number;
+  pE: number;
+  posteriorH: number;
 }) {
-  const left = 0.18;
-  const right = 0.82;
-  const bottom = 0.1;
-  const top = 0.9;
-  const height = top - bottom;
+  // Coordinate system: x in [0, 3], y in [0, 1]
+  const xPrior0 = 0.25;
+  const xPrior1 = 0.45;
+  const xGate0 = 1.42;
+  const xGate1 = 1.58;
+  const xPost0 = 2.55;
+  const xPost1 = 2.75;
 
-  const clampedTotal = clamp01(total);
-  let y = bottom;
+  const priorNotH = clamp01(1 - pH);
+  const priorH0 = priorNotH;
+  const priorH1 = 1;
+
+  const gateNotH0 = 0;
+  const gateNotH1 = clamp01(wNotH);
+  const gateH0 = gateNotH1;
+  const gateH1 = clamp01(wNotH + wH); // equals pE
+
+  const posteriorNotH = clamp01(1 - posteriorH);
+  const postNotH0 = 0;
+  const postNotH1 = posteriorNotH;
+  const postH0 = postNotH1;
+  const postH1 = 1;
+
+  const flowOpacity = 0.22;
 
   return (
     <Mafs
-      height={120}
+      height={220}
       pan={false}
       zoom={false}
       preserveAspectRatio={false}
-      viewBox={{ x: [0, 1], y: [0, 1] }}
+      viewBox={{ x: [0, 3], y: [0, 1] }}
     >
+      {/* Flow ribbons (prior → gate) */}
       <Polygon
         points={[
-          [left, bottom],
-          [right, bottom],
-          [right, top],
-          [left, top],
+          [xPrior1, 0],
+          [xGate0, gateNotH0],
+          [xGate0, gateNotH1],
+          [xPrior1, priorNotH],
         ]}
-        color={COLORS.bg}
-        fillOpacity={0.35}
+        color={COLORS.notH}
+        fillOpacity={flowOpacity}
+        strokeOpacity={0}
+      />
+      <Polygon
+        points={[
+          [xPrior1, priorNotH],
+          [xGate0, gateH0],
+          [xGate0, gateH1],
+          [xPrior1, priorH1],
+        ]}
+        color={COLORS.h}
+        fillOpacity={flowOpacity}
         strokeOpacity={0}
       />
 
-      {segments.map((segment, i) => {
-        const segmentHeight = clamp01(segment.value) * height;
-        const y0 = y;
-        const y1 = y + segmentHeight;
-        y = y1;
+      {/* Flow ribbons (gate → posterior) */}
+      <Polygon
+        points={[
+          [xGate1, gateNotH0],
+          [xPost0, postNotH0],
+          [xPost0, postNotH1],
+          [xGate1, gateNotH1],
+        ]}
+        color={COLORS.notH}
+        fillOpacity={flowOpacity}
+        strokeOpacity={0}
+      />
+      <Polygon
+        points={[
+          [xGate1, gateH0],
+          [xPost0, postH0],
+          [xPost0, postH1],
+          [xGate1, gateH1],
+        ]}
+        color={COLORS.h}
+        fillOpacity={flowOpacity}
+        strokeOpacity={0}
+      />
 
-        return (
-          <Polygon
-            key={i}
-            points={[
-              [left, y0],
-              [right, y0],
-              [right, y1],
-              [left, y1],
-            ]}
-            color={segment.color}
-            fillOpacity={1}
-            strokeOpacity={0}
-          />
-        );
-      })}
+      {/* Prior bar */}
+      <Polygon
+        points={[
+          [xPrior0, 0],
+          [xPrior1, 0],
+          [xPrior1, priorNotH],
+          [xPrior0, priorNotH],
+        ]}
+        color={COLORS.notH}
+        fillOpacity={1}
+        strokeOpacity={0}
+      />
+      <Polygon
+        points={[
+          [xPrior0, priorH0],
+          [xPrior1, priorH0],
+          [xPrior1, priorH1],
+          [xPrior0, priorH1],
+        ]}
+        color={COLORS.h}
+        fillOpacity={1}
+        strokeOpacity={0}
+      />
+      <Polygon
+        points={[
+          [xPrior0, 0],
+          [xPrior1, 0],
+          [xPrior1, 1],
+          [xPrior0, 1],
+        ]}
+        color={COLORS.outline}
+        fillOpacity={0}
+        strokeOpacity={1}
+        weight={2}
+      />
 
-      {/* Empty remainder (evidence stage) */}
-      {clampedTotal < 1 && (
+      {/* Evidence gate */}
+      <Polygon
+        points={[
+          [xGate0, 0],
+          [xGate1, 0],
+          [xGate1, gateNotH1],
+          [xGate0, gateNotH1],
+        ]}
+        color={COLORS.notH}
+        fillOpacity={1}
+        strokeOpacity={0}
+      />
+      <Polygon
+        points={[
+          [xGate0, gateH0],
+          [xGate1, gateH0],
+          [xGate1, gateH1],
+          [xGate0, gateH1],
+        ]}
+        color={COLORS.h}
+        fillOpacity={1}
+        strokeOpacity={0}
+      />
+      {/* Discarded mass (evidence not observed) */}
+      {pE < 1 && (
         <Polygon
           points={[
-            [left, bottom + clampedTotal * height],
-            [right, bottom + clampedTotal * height],
-            [right, top],
-            [left, top],
+            [xGate0, gateH1],
+            [xGate1, gateH1],
+            [xGate1, 1],
+            [xGate0, 1],
           ]}
-          color="#ffffff"
-          fillOpacity={0.75}
+          color={COLORS.bg}
+          fillOpacity={0.85}
           strokeOpacity={0}
         />
       )}
-
       <Polygon
         points={[
-          [left, bottom],
-          [right, bottom],
-          [right, top],
-          [left, top],
+          [xGate0, 0],
+          [xGate1, 0],
+          [xGate1, 1],
+          [xGate0, 1],
+        ]}
+        color={COLORS.outline}
+        fillOpacity={0}
+        strokeOpacity={1}
+        weight={2}
+      />
+
+      {/* Posterior bar */}
+      <Polygon
+        points={[
+          [xPost0, postNotH0],
+          [xPost1, postNotH0],
+          [xPost1, postNotH1],
+          [xPost0, postNotH1],
+        ]}
+        color={COLORS.notH}
+        fillOpacity={1}
+        strokeOpacity={0}
+      />
+      <Polygon
+        points={[
+          [xPost0, postH0],
+          [xPost1, postH0],
+          [xPost1, postH1],
+          [xPost0, postH1],
+        ]}
+        color={COLORS.h}
+        fillOpacity={1}
+        strokeOpacity={0}
+      />
+      <Polygon
+        points={[
+          [xPost0, 0],
+          [xPost1, 0],
+          [xPost1, 1],
+          [xPost0, 1],
         ]}
         color={COLORS.outline}
         fillOpacity={0}
@@ -112,35 +237,6 @@ function SquareStack({
         weight={2}
       />
     </Mafs>
-  );
-}
-
-function LegendRow({
-  pH,
-  pNotH,
-}: {
-  pH: number;
-  pNotH: number;
-}) {
-  return (
-    <div className="flex items-center justify-between gap-3 text-[11px] text-gray-600">
-      <div className="flex items-center gap-2">
-        <span
-          className="inline-block h-2 w-2 rounded-sm"
-          style={{ backgroundColor: COLORS.h }}
-        />
-        <span>H</span>
-        <span className="data-value text-gray-800">{formatPercent(pH, 1)}</span>
-      </div>
-      <div className="flex items-center gap-2">
-        <span
-          className="inline-block h-2 w-2 rounded-sm"
-          style={{ backgroundColor: COLORS.notH }}
-        />
-        <span>¬H</span>
-        <span className="data-value text-gray-800">{formatPercent(pNotH, 1)}</span>
-      </div>
-    </div>
   );
 }
 
@@ -181,6 +277,8 @@ export function MathNotebook({
     };
   }, [currentProbability, draftLikelihoodIfFalse, draftLikelihoodIfTrue]);
 
+  const notSymbol = '\u00AC';
+
   return (
     <aside className="md:sticky md:top-6">
       <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
@@ -190,7 +288,7 @@ export function MathNotebook({
           </p>
           <h2 className="text-lg font-semibold text-gray-900">Bayes Preview</h2>
           <p className="text-xs text-gray-500 mt-1">
-            Uses your current conviction as the prior for the next evidence.
+            One piece of evidence applied to your current belief.
           </p>
         </div>
 
@@ -198,7 +296,7 @@ export function MathNotebook({
           <div className="text-xs text-gray-600 bg-gray-50 border border-gray-200 rounded-xl p-3 flex items-center justify-between gap-4">
             <div>
               <div className="text-[11px] uppercase tracking-wide text-gray-500 font-semibold">
-                Current Conviction
+                Current Conviction (Prior)
               </div>
               <div className="text-2xl font-bold text-emerald-700 data-value">
                 {formatPercent(bayes.pH, 1)}
@@ -212,53 +310,63 @@ export function MathNotebook({
                 Bayes Factor
               </div>
               <div className="text-2xl font-bold text-gray-900 data-value">
-                {bayes.bf === Infinity ? '∞' : `${bayes.bf.toFixed(2)}×`}
+                {bayes.bf === Infinity ? '∞' : `${bayes.bf.toFixed(2)}x`}
               </div>
               <div className="text-[11px] text-gray-500">
-                P(E|H) {formatPercent(bayes.pEGivenH, 0)} · P(E|¬H) {formatPercent(bayes.pEGivenNotH, 0)}
+                P(E|H) {formatPercent(bayes.pEGivenH, 0)} · P(E|{notSymbol}H) {formatPercent(bayes.pEGivenNotH, 0)}
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div className="border border-gray-200 rounded-xl p-3">
-              <div className="text-xs font-semibold text-gray-700">Prior</div>
-              <div className="text-[11px] text-gray-500 mb-2">All possibilities</div>
-              <SquareStack
-                segments={[
-                  { value: bayes.pNotH, color: COLORS.notH },
-                  { value: bayes.pH, color: COLORS.h },
-                ]}
-              />
-              <LegendRow pH={bayes.pH} pNotH={bayes.pNotH} />
-            </div>
-
-            <div className="border border-gray-200 rounded-xl p-3">
-              <div className="text-xs font-semibold text-gray-700">Evidence</div>
-              <div className="text-[11px] text-gray-500 mb-2">Weights that survive</div>
-              <SquareStack
-                total={bayes.pE}
-                segments={[
-                  { value: bayes.wNotH, color: COLORS.notH },
-                  { value: bayes.wH, color: COLORS.h },
-                ]}
-              />
-              <div className="text-[11px] text-gray-600 flex items-center justify-between">
-                <span>P(E) total</span>
-                <span className="data-value text-gray-800">{formatPercent(bayes.pE, 1)}</span>
+          <div className="border border-gray-200 rounded-xl p-3">
+            <div className="grid grid-cols-3 gap-2 text-[11px] text-gray-600 mb-2">
+              <div>
+                <div className="font-semibold text-gray-700">Prior</div>
+                <div className="text-gray-500">All possibilities</div>
+              </div>
+              <div className="text-center">
+                <div className="font-semibold text-gray-700">Evidence Filter</div>
+                <div className="text-gray-500">Keep what fits E</div>
+              </div>
+              <div className="text-right">
+                <div className="font-semibold text-gray-700">Posterior</div>
+                <div className="text-gray-500">Updated belief</div>
               </div>
             </div>
 
-            <div className="border border-gray-200 rounded-xl p-3">
-              <div className="text-xs font-semibold text-gray-700">Posterior</div>
-              <div className="text-[11px] text-gray-500 mb-2">Updated belief</div>
-              <SquareStack
-                segments={[
-                  { value: bayes.posteriorNotH, color: COLORS.notH },
-                  { value: bayes.posteriorH, color: COLORS.h },
-                ]}
-              />
-              <LegendRow pH={bayes.posteriorH} pNotH={bayes.posteriorNotH} />
+            <BayesFlowDiagram
+              pH={bayes.pH}
+              wH={bayes.wH}
+              wNotH={bayes.wNotH}
+              pE={bayes.pE}
+              posteriorH={bayes.posteriorH}
+            />
+
+            <div className="mt-3 grid grid-cols-2 gap-3 text-[11px] text-gray-600">
+              <div className="flex items-center justify-between gap-3">
+                <span className="flex items-center gap-2">
+                  <span className="inline-block h-2 w-2 rounded-sm" style={{ backgroundColor: COLORS.h }} />
+                  H
+                </span>
+                <span className="data-value text-gray-800">
+                  {formatPercent(bayes.pH, 1)} → {formatPercent(bayes.posteriorH, 1)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <span className="flex items-center gap-2">
+                  <span className="inline-block h-2 w-2 rounded-sm" style={{ backgroundColor: COLORS.notH }} />
+                  {notSymbol}H
+                </span>
+                <span className="data-value text-gray-800">
+                  {formatPercent(bayes.pNotH, 1)} → {formatPercent(bayes.posteriorNotH, 1)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-3 col-span-2">
+                <span className="text-gray-500">
+                  Total fit P(E) (how much survives the filter)
+                </span>
+                <span className="data-value text-gray-800">{formatPercent(bayes.pE, 1)}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -266,3 +374,4 @@ export function MathNotebook({
     </aside>
   );
 }
+
