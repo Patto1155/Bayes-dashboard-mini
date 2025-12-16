@@ -1,0 +1,139 @@
+@import "katex/dist/katex.min.css";
+@import "mafs/core.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Mafs (light theme overrides) */
+.MafsView {
+  --mafs-bg: transparent;
+  --mafs-fg: #111827;
+  --mafs-line-color: #d1d5db;
+  --grid-line-subdivision-color: #e5e7eb;
+}
+
+/* Scientific Notebook Aesthetic */
+html {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+}
+
+body {
+  background-color: white;
+  color: #111827;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Tabular numbers for non-jittery value changes */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Math-style italic */
+.math-italic {
+  font-style: italic;
+  font-family: 'Times New Roman', Times, Georgia, serif;
+}
+
+/* Monospace for data values */
+.data-value {
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Custom slider tracks - Green */
+.slider-green {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: #a7f3d0;
+  outline: none;
+}
+
+.slider-green::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 9999px;
+  background: #059669;
+  cursor: pointer;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+.slider-green::-moz-range-thumb {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 9999px;
+  background: #059669;
+  cursor: pointer;
+  border: none;
+}
+
+/* Custom slider tracks - Red */
+.slider-red {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: #fecdd3;
+  outline: none;
+}
+
+.slider-red::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 9999px;
+  background: #e11d48;
+  cursor: pointer;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+.slider-red::-moz-range-thumb {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 9999px;
+  background: #e11d48;
+  cursor: pointer;
+  border: none;
+}
+
+/* Custom slider tracks - Gray */
+.slider-gray {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 0.75rem;
+  border-radius: 9999px;
+  background: #e5e7eb;
+  outline: none;
+}
+
+.slider-gray::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 9999px;
+  background: #374151;
+  cursor: pointer;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  border: 2px solid white;
+}
+
+.slider-gray::-moz-range-thumb {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 9999px;
+  background: #374151;
+  cursor: pointer;
+  border: 2px solid white;
+}
