@@ -149,7 +149,7 @@ function App() {
                     No Evidence Yet
                   </h3>
                   <p className="text-sm text-gray-500">
-                    Add evidence above — the math preview updates live as you adjust sliders.
+                    Add evidence above - the math preview updates live as you adjust sliders.
                   </p>
                 </div>
               ) : (

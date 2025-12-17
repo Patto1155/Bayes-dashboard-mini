@@ -27,7 +27,7 @@ export function BayesFactorDisplay({
 
         {/* The Fraction with Live Values */}
         <div className="flex flex-col items-center">
-          {/* Numerator (Green - True) */}
+          {/* Numerator (Signal - True) */}
           <motion.span
             key={`true-${trueLikelihood}`}
             initial={{ opacity: 0.5, y: -5 }}
@@ -41,7 +41,7 @@ export function BayesFactorDisplay({
           {/* Fraction bar */}
           <div className="border-t-2 border-gray-400 w-full my-0.5"></div>
 
-          {/* Denominator (Red - False) */}
+          {/* Denominator (Noise - False) */}
           <motion.span
             key={`false-${falseLikelihood}`}
             initial={{ opacity: 0.5, y: 5 }}
@@ -69,7 +69,7 @@ export function BayesFactorDisplay({
 
       {/* Educational subtitle */}
       <div className="text-xs text-gray-500 text-center mb-3">
-        <LatexFormula>P(Evidence | True) / P(Evidence | False)</LatexFormula>
+        <LatexFormula>P(Evidence | H) / P(Evidence | False)</LatexFormula>
       </div>
 
       {/* Interpretation */}

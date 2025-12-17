@@ -1,4 +1,4 @@
-// Footer (attribution only — math lives in the right column now)
+// Footer (attribution only - math lives in the right column now)
 
 export function Footer() {
   return (
@@ -8,7 +8,7 @@ export function Footer() {
           "The essence of good judgment is matching the strength of your opinions to the strength of your evidence."
         </p>
         <p className="text-xs text-gray-400 mt-1">
-          — Philip Tetlock, <em>Superforecasting</em>
+          - Philip Tetlock, <em>Superforecasting</em>
         </p>
       </div>
     </footer>

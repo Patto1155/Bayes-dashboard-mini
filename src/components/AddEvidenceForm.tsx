@@ -102,12 +102,18 @@ export function AddEvidenceForm({
         <div className="space-y-4">
           <div>
             <div className="flex items-baseline justify-between gap-4 mb-1">
-              <label className="block text-sm font-semibold text-emerald-700">
-                If thesis true
-              </label>
-              <span className="text-xs text-gray-500">
-                P(E|H)
-              </span>
+              <div className="flex items-center gap-2">
+                <label className="block text-sm font-semibold text-emerald-700">
+                  If thesis true
+                </label>
+                <span
+                  className="inline-flex items-center justify-center w-4 h-4 rounded-full border border-gray-300 text-gray-500 text-[10px] leading-none"
+                  title="If your thesis is true, how likely is it that you would see this evidence?"
+                >
+                  ?
+                </span>
+              </div>
+              <span className="text-xs text-gray-500">P(E|H)</span>
             </div>
             <div className="flex items-center gap-3">
               <input
@@ -130,12 +136,18 @@ export function AddEvidenceForm({
 
           <div>
             <div className="flex items-baseline justify-between gap-4 mb-1">
-              <label className="block text-sm font-semibold text-rose-700">
-                If thesis wrong
-              </label>
-              <span className="text-xs text-gray-500">
-                P(E|¬H)
-              </span>
+              <div className="flex items-center gap-2">
+                <label className="block text-sm font-semibold text-rose-700">
+                  If thesis false
+                </label>
+                <span
+                  className="inline-flex items-center justify-center w-4 h-4 rounded-full border border-gray-300 text-gray-500 text-[10px] leading-none"
+                  title="If your thesis is false, how likely is it that you would still see this evidence anyway (by coincidence or other causes)?"
+                >
+                  ?
+                </span>
+              </div>
+              <span className="text-xs text-gray-500">P(E|False)</span>
             </div>
             <div className="flex items-center gap-3">
               <input

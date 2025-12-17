@@ -22,13 +22,12 @@ export function oddsToProb(odds: number): number {
 
 /**
  * Calculate Bayes Factor
- * BF = P(E|H) / P(E|¬H)
+ * BF = P(E|H) / P(E|False)
  */
 export function calculateBayesFactor(
   likelihoodIfTrue: number,
   likelihoodIfFalse: number
 ): number {
-  // Handle zero denominator - prevent division by zero
   if (likelihoodIfFalse === 0) {
     return likelihoodIfTrue > 0 ? Infinity : 1;
   }
@@ -37,13 +36,10 @@ export function calculateBayesFactor(
 
 /**
  * Update belief using Bayes' Theorem (Odds Form)
- * O_new = O_prior × BayesFactor
+ * O_new = O_prior x BayesFactor
  * P_new = O_new / (1 + O_new)
  */
-export function updateBelief(
-  priorProb: number,
-  bayesFactor: number
-): number {
+export function updateBelief(priorProb: number, bayesFactor: number): number {
   const priorOdds = probToOdds(priorProb);
   const posteriorOdds = priorOdds * bayesFactor;
   return oddsToProb(posteriorOdds);
@@ -51,20 +47,15 @@ export function updateBelief(
 
 /**
  * Calculate Kelly Criterion position size
- * f* = (p × b - q) / b
+ * f* = (p x b - q) / b
  * where p = probability of winning, q = 1-p, b = odds offered
  */
-export function calculateKelly(
-  probability: number,
-  oddsOffered: number = 3
-): number {
+export function calculateKelly(probability: number, oddsOffered: number = 3): number {
   const p = probability;
   const q = 1 - probability;
   const b = oddsOffered;
-  
+
   const kelly = (p * b - q) / b;
-  
-  // Kelly can be negative (suggesting no position)
   return Math.max(0, kelly);
 }
 
@@ -79,19 +70,16 @@ export function formatPercent(value: number, decimals: number = 1): string {
  * Format a Bayes Factor value
  */
 export function formatBayesFactor(bf: number): string {
-  if (bf === Infinity) return '∞×';
-  if (bf >= 100) return `${bf.toFixed(0)}×`;
-  if (bf >= 10) return `${bf.toFixed(1)}×`;
-  return `${bf.toFixed(2)}×`;
+  if (!Number.isFinite(bf)) return 'Infx';
+  if (bf >= 100) return `${bf.toFixed(0)}x`;
+  if (bf >= 10) return `${bf.toFixed(1)}x`;
+  return `${bf.toFixed(2)}x`;
 }
 
 /**
  * Get interpretation of Bayes Factor
  */
-export function interpretBayesFactor(bf: number): {
-  text: string;
-  color: string;
-} {
+export function interpretBayesFactor(bf: number): { text: string; color: string } {
   if (bf > 10) return { text: 'Strong Support', color: 'text-emerald-600' };
   if (bf > 3) return { text: 'Moderate Support', color: 'text-emerald-500' };
   if (bf > 1) return { text: 'Weak Support', color: 'text-emerald-400' };
